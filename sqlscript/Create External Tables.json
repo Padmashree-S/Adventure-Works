@@ -1,0 +1,17 @@
+{
+	"name": "Create External Tables",
+	"properties": {
+		"content": {
+			"query": "CREATE DATABASE SCOPED CREDENTIAL cred_shree\nWITH\n    IDENTITY = 'Managed Identity'\n\n\nCREATE EXTERNAL DATA SOURCE source_silver\nWITH\n(\n    LOCATION = 'https://awtestdatalake.blob.core.windows.net/silver',\n    CREDENTIAL = cred_shree\n)\n\nCREATE EXTERNAL DATA SOURCE source_gold\nWITH\n(\n    LOCATION = 'https://awtestdatalake.blob.core.windows.net/gold',\n    CREDENTIAL = cred_shree\n)\n\nCREATE EXTERNAL FILE FORMAT format_parquet\nWITH\n(\n    FORMAT_TYPE = PARQUET,\n    DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec'\n)\n\n--CREATE EXTERNAL TABLE EXTSALES\n\nCREATE EXTERNAL TABLE gold.extsales\nWITH\n(\n    LOCATION = 'extsales',\n    DATA_SOURCE = source_gold,\n    FILE_FORMAT = format_parquet\n)\nAS\nSELECT \n    * \nFROM \n    OPENROWSET\n        (\n            BULK 'https://awtestdatalake.blob.core.windows.net/silver/AdventureWorks_Sales/',\n            FORMAT = 'PARQUET'\n        ) as QUER1\n\n\nSELECT * FROM gold.extsales",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "awdatabase",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
